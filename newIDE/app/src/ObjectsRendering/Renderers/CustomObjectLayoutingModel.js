@@ -485,12 +485,8 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
         renderedInstance.getDefaultHeight();
       y = top + originY;
     }
-    layoutedInstance.setCustomHeight(height);
-    // This ensure objects are centered if their dimensions changed from the
-    // custom ones (preferred ones).
-    // For instance, text object dimensions change according to how the text is wrapped.
-    renderedInstance.update();
     layoutedInstance.y = y;
+    layoutedInstance.setCustomHeight(height);
   }
   return renderedInstance;
 };

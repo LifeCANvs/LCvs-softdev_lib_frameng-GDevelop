@@ -4,7 +4,6 @@ import Rendered3DInstance from './Rendered3DInstance';
 import PixiResourcesLoader from '../PixiResourcesLoader';
 import ResourcesLoader from '../../ResourcesLoader';
 import ObjectsRenderingService from '../ObjectsRenderingService';
-import RenderedTextInstance from './RenderedTextInstance';
 import {
   getLayoutedRenderedInstance,
   LayoutedInstance,
