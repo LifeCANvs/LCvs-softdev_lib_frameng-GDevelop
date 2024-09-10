@@ -57,34 +57,23 @@ export interface PropertiesContainer {
 /**
  * Build the layouts description from the custom object properties.
  */
-export const getObjectAnchors = (
+export const getObjectAnchor = (
   eventBasedObject: gdEventsBasedObject,
-  customObjectConfiguration: PropertiesContainer
-): Map<string, ObjectAnchor> => {
-  const childObjects = eventBasedObject.getObjects();
-  return new Map<string, ObjectAnchor>(
-    mapFor(0, childObjects.getObjectsCount(), i => {
-      const childObject = childObjects.getObjectAt(i);
-
-      if (!childObject.hasBehaviorNamed('Anchor')) {
-        return null;
-      }
-      const properties = childObject.getBehavior('Anchor').getProperties();
-      const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
-      const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
-      const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
-      const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
-
-      return [
-        childObject.getName(),
-        { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor },
-      ];
-    }).filter(Boolean)
-  );
+  customObjectConfiguration: PropertiesContainer,
+  objectName: string
+): ObjectAnchor => {
+  const childObject = eventBasedObject.getObjects().getObject(objectName);
+  if (!childObject.hasBehaviorNamed('Anchor')) {
+    return null;
+  }
+  const properties = childObject.getBehavior('Anchor').getProperties();
+  const leftEdgeAnchor = getPropertyValue(properties, 'leftEdgeAnchor');
+  const topEdgeAnchor = getPropertyValue(properties, 'topEdgeAnchor');
+  const rightEdgeAnchor = getPropertyValue(properties, 'rightEdgeAnchor');
+  const bottomEdgeAnchor = getPropertyValue(properties, 'bottomEdgeAnchor');
+  return { leftEdgeAnchor, topEdgeAnchor, rightEdgeAnchor, bottomEdgeAnchor };
 };
 
-// TODO EBO Make an event-based object instance editor (like the one for the scene)
-// and use real instances instead of this.
 /**
  * A minimal implementation of a fake gdInitialInstance to allow to store
  * layouting results without actually modifying events-based objects initial
@@ -307,24 +296,16 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
     parent._associatedObjectConfiguration
   );
 
-  const objectAnchors = getObjectAnchors(
-    eventBasedObject,
-    customObjectConfiguration
-  );
-
-  const parentInitialMinX = eventBasedObject.getAreaMinX();
-  const parentInitialMinY = eventBasedObject.getAreaMinY();
-  const parentInitialMaxX = eventBasedObject.getAreaMaxX();
-  const parentInitialMaxY = eventBasedObject.getAreaMaxY();
-  const parentInitialWidth = parentInitialMaxX - parentInitialMinX;
-  const parentInitialHeight = parentInitialMaxY - parentInitialMinY;
-
   const layoutedInstance = parent.getLayoutedInstance(initialInstance);
   const renderedInstance = parent.getRendererOfInstance(
     ((layoutedInstance: any): gdInitialInstance)
   );
 
-  const objectAnchor = objectAnchors.get(layoutedInstance.getObjectName());
+  const objectAnchor = getObjectAnchor(
+    eventBasedObject,
+    customObjectConfiguration,
+    layoutedInstance.getObjectName()
+  );
   const leftEdgeAnchor = objectAnchor
     ? objectAnchor.leftEdgeAnchor
     : gd.CustomObjectConfiguration.NoAnchor;
@@ -337,6 +318,13 @@ export const getLayoutedRenderedInstance = <T: ChildRenderedInstance>(
   const bottomEdgeAnchor = objectAnchor
     ? objectAnchor.bottomEdgeAnchor
     : gd.CustomObjectConfiguration.NoAnchor;
+
+  const parentInitialMinX = eventBasedObject.getAreaMinX();
+  const parentInitialMinY = eventBasedObject.getAreaMinY();
+  const parentInitialMaxX = eventBasedObject.getAreaMaxX();
+  const parentInitialMaxY = eventBasedObject.getAreaMaxY();
+  const parentInitialWidth = parentInitialMaxX - parentInitialMinX;
+  const parentInitialHeight = parentInitialMaxY - parentInitialMinY;
 
   const parentWidth = parent.getWidth();
   const parentHeight = parent.getHeight();

@@ -21,7 +21,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   _height: number;
   _tiled: boolean;
   _wasRendered: boolean;
-  _isDestroyed = false;
 
   constructor(
     project: gdProject,
@@ -118,7 +117,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   }
 
   onRemovedFromScene(): void {
-    this._isDestroyed = true;
     super.onRemovedFromScene();
     // Destroy textures because they are instantiated by this class:
     // all textures of borderSprites and centerSprite are "owned" by them.
@@ -235,9 +233,6 @@ export default class RenderedPanelSpriteInstance extends RenderedInstance {
   }
 
   updateTextures() {
-    if (this._isDestroyed) {
-      return;
-    }
     const panelSprite = gd.asPanelSpriteConfiguration(
       this._associatedObjectConfiguration
     );
