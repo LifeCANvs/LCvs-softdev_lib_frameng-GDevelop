@@ -7,12 +7,15 @@ import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import FlatButton from '../UI/FlatButton';
 import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
 import Text from '../UI/Text';
-import { useResponsiveWindowSize } from '../UI/Responsive/ResponsiveWindowMeasurer';
-import Paper from '../UI/Paper';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { useGameAndBuildsManager } from '../Utils/UseGameAndBuildsManager';
 import { sendQuickCustomizationProgress } from '../Utils/Analytics/EventSender';
 import ScrollView from '../UI/ScrollView';
+import PreviewIcon from '../UI/CustomSvgIcons/Preview';
+import { Column } from '../UI/Grid';
+import Paper from '../UI/Paper';
+import PlaySquared from '../UI/CustomSvgIcons/PlaySquared';
+import GDevelopThemeContext from '../UI/Theme/GDevelopThemeContext';
 
 type Props = {|
   project: gdProject,
@@ -42,9 +45,7 @@ export const QuickCustomizationDialog = ({
     copyLeaderboardsAndMultiplayerLobbiesFromGameId: sourceGameId,
   });
   const quickCustomizationState = useQuickCustomizationState({ onClose });
-  const { windowSize } = useResponsiveWindowSize();
-
-  const isMediumOrSmaller = windowSize === 'small' || windowSize === 'medium';
+  const gdevelopTheme = React.useContext(GDevelopThemeContext);
 
   const onContinueQuickCustomization = React.useCallback(
     () => {
@@ -60,12 +61,7 @@ export const QuickCustomizationDialog = ({
     [onClose]
   );
 
-  const {
-    title,
-    titleRightContent,
-    titleTopContent,
-    content,
-  } = renderQuickCustomization({
+  const { title, content, showPreview } = renderQuickCustomization({
     project,
     gameAndBuildsManager,
     resourceManagementProps,
@@ -95,11 +91,6 @@ export const QuickCustomizationDialog = ({
     <Dialog
       open
       title={null}
-      fixedContent={
-        isMediumOrSmaller ? (
-          <Paper background="dark">{titleTopContent}</Paper>
-        ) : null
-      }
       maxWidth="md"
       fullHeight
       actions={
@@ -140,21 +131,52 @@ export const QuickCustomizationDialog = ({
       ]}
       flexBody
     >
-      <ScrollView key={quickCustomizationState.step.name}>
-        <ColumnStackLayout noMargin expand>
-          <LineStackLayout
-            noMargin
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Text noMargin size={'title'}>
-              {title}
-            </Text>
-            {!isMediumOrSmaller ? titleRightContent : null}
-          </LineStackLayout>
-          {content}
-        </ColumnStackLayout>
-      </ScrollView>
+      <ColumnStackLayout noMargin>
+        <ScrollView key={quickCustomizationState.step.name}>
+          <ColumnStackLayout noMargin expand>
+            <LineStackLayout
+              noMargin
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Text noMargin size={'title'}>
+                {title}
+              </Text>
+            </LineStackLayout>
+            {content}
+          </ColumnStackLayout>
+        </ScrollView>
+        {showPreview ? (
+          <Column>
+            <Paper background="light">
+              <Column>
+                <LineStackLayout
+                  alignItems="center"
+                  justifyContent="space-between"
+                  expand
+                >
+                  <LineStackLayout
+                    noMargin
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <PlaySquared htmlColor={gdevelopTheme.message.valid} />
+                    <Text noMargin size="body-small">
+                      Preview your game
+                    </Text>
+                  </LineStackLayout>
+                  <FlatButton
+                    primary
+                    label={<Trans>Preview</Trans>}
+                    onClick={onLaunchPreview}
+                    leftIcon={<PreviewIcon />}
+                  />
+                </LineStackLayout>
+              </Column>
+            </Paper>
+          </Column>
+        ) : null}
+      </ColumnStackLayout>
     </Dialog>
   );
 };

@@ -4,11 +4,7 @@ import { QuickObjectReplacer } from './QuickObjectReplacer';
 import { QuickBehaviorsTweaker } from './QuickBehaviorsTweaker';
 import { type ResourceManagementProps } from '../ResourcesList/ResourceSource';
 import { QuickPublish } from './QuickPublish';
-import { ColumnStackLayout, LineStackLayout } from '../UI/Layout';
-import Text from '../UI/Text';
-import FlatButton from '../UI/FlatButton';
 import { Trans } from '@lingui/macro';
-import PreviewIcon from '../UI/CustomSvgIcons/Preview';
 import { type Exporter } from '../ExportAndShare/ShareDialog';
 import { mapFor } from '../Utils/MapFor';
 import { canSwapAssetOfObject } from '../AssetStore/AssetSwapper';
@@ -176,36 +172,6 @@ export const renderQuickCustomization = ({
 }: Props) => {
   return {
     title: quickCustomizationState.step.title,
-    titleRightContent: quickCustomizationState.step.canPreview ? (
-      <LineStackLayout noMargin alignItems="center">
-        <Text noMargin size={'body-small'}>
-          Preview your game
-        </Text>
-        <FlatButton
-          label={<Trans>Preview</Trans>}
-          onClick={onLaunchPreview}
-          leftIcon={<PreviewIcon />}
-        />
-      </LineStackLayout>
-    ) : null,
-    titleTopContent: quickCustomizationState.step.canPreview ? (
-      <ColumnStackLayout>
-        <LineStackLayout
-          justifyContent="space-between"
-          alignItems="center"
-          expand
-        >
-          <Text noMargin size={'body-small'}>
-            Preview your game
-          </Text>
-          <FlatButton
-            label={<Trans>Preview</Trans>}
-            onClick={onLaunchPreview}
-            leftIcon={<PreviewIcon />}
-          />
-        </LineStackLayout>
-      </ColumnStackLayout>
-    ) : null,
     content: (
       <>
         {quickCustomizationState.step.name === 'replace-objects' ? (
@@ -238,5 +204,6 @@ export const renderQuickCustomization = ({
         ) : null}
       </>
     ),
+    showPreview: quickCustomizationState.step.canPreview,
   };
 };
